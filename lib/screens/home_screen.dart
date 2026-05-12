@@ -18,7 +18,7 @@ class HomeScreen extends StatelessWidget {
         title: Row(
           children: [
             Text(
-              'Summary ',
+              'Trenni ',
               style: theme.textTheme.headlineSmall?.copyWith(
                 fontWeight: FontWeight.bold,
               ),
@@ -45,31 +45,24 @@ class HomeScreen extends StatelessWidget {
         ],
       ),
       body: SingleChildScrollView(
-        padding: const EdgeInsets.symmetric(vertical: 16),
+        padding: EdgeInsets.fromLTRB(
+          0,
+          16,
+          0,
+          MediaQuery.of(context).padding.bottom,
+        ),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             // Pockets Section
             const _PocketsSection(),
-            const SizedBox(height: 24),
-
-            // Graph Section
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 16),
-              child: Text(
-                'Balance Evolution',
-                style: theme.textTheme.titleMedium?.copyWith(
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
-            ),
             const SizedBox(height: 12),
             const _BalanceGraph(),
-            const SizedBox(height: 24),
+            const SizedBox(height: 12),
 
             // Accounts Section
             const _AccountsSection(),
-            const SizedBox(height: 24),
+            const SizedBox(height: 12),
 
             // Transactions Section
             Padding(
@@ -83,6 +76,7 @@ class HomeScreen extends StatelessWidget {
             ),
             const SizedBox(height: 12),
             const _TransactionsSection(),
+            const SizedBox(height: 16),
           ],
         ),
       ),
@@ -211,7 +205,7 @@ class _BalanceGraph extends StatelessWidget {
     return Container(
       height: 220,
       margin: const EdgeInsets.symmetric(horizontal: 16),
-      padding: const EdgeInsets.all(16),
+      padding: const EdgeInsets.only(top: 20, right: 24, left: 8, bottom: 8),
       decoration: BoxDecoration(
         color: colorScheme.surface,
         borderRadius: BorderRadius.circular(16),
@@ -225,9 +219,86 @@ class _BalanceGraph extends StatelessWidget {
       ),
       child: LineChart(
         LineChartData(
-          gridData: const FlGridData(show: false),
-          titlesData: const FlTitlesData(show: false),
+          gridData: FlGridData(
+            show: true,
+            drawVerticalLine: false,
+            getDrawingHorizontalLine: (value) {
+              return FlLine(
+                color: colorScheme.outlineVariant.withValues(alpha: 0.2),
+                strokeWidth: 1,
+              );
+            },
+          ),
+          titlesData: FlTitlesData(
+            show: true,
+            rightTitles: const AxisTitles(
+              sideTitles: SideTitles(showTitles: false),
+            ),
+            topTitles: const AxisTitles(
+              sideTitles: SideTitles(showTitles: false),
+            ),
+            bottomTitles: AxisTitles(
+              sideTitles: SideTitles(
+                showTitles: true,
+                reservedSize: 30,
+                interval: 1,
+                getTitlesWidget: (value, meta) {
+                  const style = TextStyle(
+                    fontSize: 10,
+                    fontWeight: FontWeight.bold,
+                  );
+                  String text;
+                  switch (value.toInt()) {
+                    case 0:
+                      text = 'Oct 12';
+                      break;
+                    case 2:
+                      text = 'Oct 14';
+                      break;
+                    case 4:
+                      text = 'Oct 16';
+                      break;
+                    case 6:
+                      text = 'Oct 18';
+                      break;
+                    default:
+                      return Container();
+                  }
+                  return SideTitleWidget(
+                    meta: meta,
+                    space: 8,
+                    child: Text(text, style: style),
+                  );
+                },
+              ),
+            ),
+            leftTitles: AxisTitles(
+              sideTitles: SideTitles(
+                showTitles: true,
+                interval: 500,
+                getTitlesWidget: (value, meta) {
+                  const style = TextStyle(
+                    fontSize: 10,
+                    fontWeight: FontWeight.bold,
+                  );
+                  return SideTitleWidget(
+                    meta: meta,
+                    space: 8,
+                    child: Text(
+                      '\$${(value / 1000).toStringAsFixed(1)}k',
+                      style: style,
+                    ),
+                  );
+                },
+                reservedSize: 42,
+              ),
+            ),
+          ),
           borderData: FlBorderData(show: false),
+          minX: 0,
+          maxX: 6,
+          minY: 2500,
+          maxY: 4000,
           lineBarsData: [
             LineChartBarData(
               spots: const [
@@ -269,9 +340,24 @@ class _AccountsSection extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final accounts = [
-      {'name': 'Checking', 'balance': 2540.50, 'expected': 450.0},
-      {'name': 'Credit Card', 'balance': -120.40, 'expected': 800.0},
-      {'name': 'Investment', 'balance': 15200.00, 'expected': 0.0},
+      {
+        'name': 'Checking',
+        'balance': 2540.50,
+        'expected': 450.0,
+        'icon': Icons.account_balance_outlined,
+      },
+      {
+        'name': 'Credit Card',
+        'balance': -120.40,
+        'expected': 800.0,
+        'icon': Icons.credit_card_outlined,
+      },
+      {
+        'name': 'Investment',
+        'balance': 15200.00,
+        'expected': 0.0,
+        'icon': Icons.trending_up_outlined,
+      },
     ];
 
     return SingleChildScrollView(
@@ -302,12 +388,28 @@ class _AccountsSection extends StatelessWidget {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text(
-                      account['name'] as String,
-                      style: Theme.of(context).textTheme.labelMedium?.copyWith(
-                        color: Theme.of(context).colorScheme.onSurfaceVariant,
-                        fontWeight: FontWeight.bold,
-                      ),
+                    Row(
+                      children: [
+                        Icon(
+                          account['icon'] as IconData,
+                          size: 16,
+                          color: Theme.of(context).colorScheme.primary,
+                        ),
+                        const SizedBox(width: 8),
+                        Expanded(
+                          child: Text(
+                            account['name'] as String,
+                            style: Theme.of(context).textTheme.labelMedium
+                                ?.copyWith(
+                                  color: Theme.of(
+                                    context,
+                                  ).colorScheme.onSurfaceVariant,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                            overflow: TextOverflow.ellipsis,
+                          ),
+                        ),
+                      ],
                     ),
                     const SizedBox(height: 8),
                     Text(
@@ -336,6 +438,33 @@ class _AccountsSection extends StatelessWidget {
 
 class _TransactionsSection extends StatelessWidget {
   const _TransactionsSection();
+
+  String _getEmoji(String pocket, String name) {
+    final n = name.toLowerCase();
+    if (n.contains('starbucks')) return '☕';
+    if (n.contains('apple music')) return '🎵';
+    if (n.contains('netflix')) return '📺';
+    if (n.contains('gas station')) return '⛽';
+    if (n.contains('uber')) return '🚗';
+    if (n.contains('salary')) return '💰';
+    if (n.contains('gym')) return '💪';
+    if (n.contains('whole foods')) return '🥦';
+
+    switch (pocket.toLowerCase()) {
+      case 'groceries':
+        return '🛒';
+      case 'income':
+        return '💰';
+      case 'entertainment':
+        return '🎭';
+      case 'transport':
+        return '🚲';
+      case 'health':
+        return '🏥';
+      default:
+        return '📝';
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -368,6 +497,34 @@ class _TransactionsSection extends StatelessWidget {
         'pocket': 'Transport',
         'accounts': ['Checking'],
       },
+      {
+        'name': 'Whole Foods',
+        'date': 'Oct 24, 2023',
+        'amount': -120.50,
+        'pocket': 'Groceries',
+        'accounts': ['Checking'],
+      },
+      {
+        'name': 'Apple Music',
+        'date': 'Oct 22, 2023',
+        'amount': -9.99,
+        'pocket': 'Entertainment',
+        'accounts': ['Credit Card'],
+      },
+      {
+        'name': 'Uber Ride',
+        'date': 'Oct 20, 2023',
+        'amount': -25.00,
+        'pocket': 'Transport',
+        'accounts': ['Checking'],
+      },
+      {
+        'name': 'Gym Membership',
+        'date': 'Oct 15, 2023',
+        'amount': -50.00,
+        'pocket': 'Health',
+        'accounts': ['Checking'],
+      },
     ];
 
     return ListView.builder(
@@ -397,76 +554,103 @@ class _TransactionsSection extends StatelessWidget {
           ),
           child: Padding(
             padding: const EdgeInsets.all(12),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
+            child: Row(
               children: [
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Text(
-                      tx['name'] as String,
-                      style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                        fontWeight: FontWeight.bold,
-                      ),
+                Container(
+                  width: 48,
+                  height: 48,
+                  decoration: BoxDecoration(
+                    color: Theme.of(context).colorScheme.surfaceContainerHighest
+                        .withValues(alpha: 0.5),
+                    shape: BoxShape.circle,
+                  ),
+                  child: Center(
+                    child: Text(
+                      _getEmoji(tx['pocket'] as String, tx['name'] as String),
+                      style: const TextStyle(fontSize: 24),
                     ),
-                    Text(
-                      '${isPositive ? '+' : ''}\$${amount.abs().toStringAsFixed(2)}',
-                      style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                        fontWeight: FontWeight.bold,
-                        color: isPositive ? Colors.green.shade700 : null,
-                      ),
-                    ),
-                  ],
-                ),
-                const SizedBox(height: 4),
-                Text(
-                  tx['date'] as String,
-                  style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                    color: Theme.of(context).colorScheme.onSurfaceVariant,
                   ),
                 ),
-                const SizedBox(height: 12),
-                Wrap(
-                  spacing: 8,
-                  runSpacing: 4,
-                  children: [
-                    Container(
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 8,
-                        vertical: 4,
+                const SizedBox(width: 12),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Text(
+                            tx['name'] as String,
+                            style: Theme.of(context).textTheme.titleMedium
+                                ?.copyWith(fontWeight: FontWeight.bold),
+                          ),
+                          Text(
+                            '${isPositive ? '+' : ''}\$${amount.abs().toStringAsFixed(2)}',
+                            style: Theme.of(context).textTheme.titleMedium
+                                ?.copyWith(
+                                  fontWeight: FontWeight.bold,
+                                  color: isPositive
+                                      ? Colors.green.shade700
+                                      : null,
+                                ),
+                          ),
+                        ],
                       ),
-                      decoration: BoxDecoration(
-                        color: Theme.of(context).colorScheme.primaryContainer,
-                        borderRadius: BorderRadius.circular(6),
-                      ),
-                      child: Text(
-                        tx['pocket'] as String,
-                        style: Theme.of(context).textTheme.labelSmall?.copyWith(
-                          color: Theme.of(
-                            context,
-                          ).colorScheme.onPrimaryContainer,
+                      const SizedBox(height: 4),
+                      Text(
+                        tx['date'] as String,
+                        style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                          color: Theme.of(context).colorScheme.onSurfaceVariant,
                         ),
                       ),
-                    ),
-                    ...(tx['accounts'] as List<String>).map(
-                      (acc) => Container(
-                        padding: const EdgeInsets.symmetric(
-                          horizontal: 8,
-                          vertical: 4,
-                        ),
-                        decoration: BoxDecoration(
-                          color: Theme.of(
-                            context,
-                          ).colorScheme.surfaceContainerHighest,
-                          borderRadius: BorderRadius.circular(6),
-                        ),
-                        child: Text(
-                          acc,
-                          style: Theme.of(context).textTheme.labelSmall,
-                        ),
+                      const SizedBox(height: 12),
+                      Wrap(
+                        spacing: 8,
+                        runSpacing: 4,
+                        children: [
+                          Container(
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 8,
+                              vertical: 4,
+                            ),
+                            decoration: BoxDecoration(
+                              color: Theme.of(
+                                context,
+                              ).colorScheme.primaryContainer,
+                              borderRadius: BorderRadius.circular(6),
+                            ),
+                            child: Text(
+                              tx['pocket'] as String,
+                              style: Theme.of(context).textTheme.labelSmall
+                                  ?.copyWith(
+                                    color: Theme.of(
+                                      context,
+                                    ).colorScheme.onPrimaryContainer,
+                                  ),
+                            ),
+                          ),
+                          ...(tx['accounts'] as List<String>).map(
+                            (acc) => Container(
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 8,
+                                vertical: 4,
+                              ),
+                              decoration: BoxDecoration(
+                                color: Theme.of(
+                                  context,
+                                ).colorScheme.surfaceContainerHighest,
+                                borderRadius: BorderRadius.circular(6),
+                              ),
+                              child: Text(
+                                acc,
+                                style: Theme.of(context).textTheme.labelSmall,
+                              ),
+                            ),
+                          ),
+                        ],
                       ),
-                    ),
-                  ],
+                    ],
+                  ),
                 ),
               ],
             ),
