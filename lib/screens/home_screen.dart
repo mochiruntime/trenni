@@ -10,10 +10,10 @@ class HomeScreen extends StatelessWidget {
     final colorScheme = theme.colorScheme;
 
     return Scaffold(
-      backgroundColor: colorScheme.surface,
+      backgroundColor: theme.scaffoldBackgroundColor,
       appBar: AppBar(
         titleSpacing: 16,
-        backgroundColor: colorScheme.surface,
+        backgroundColor: theme.scaffoldBackgroundColor,
         elevation: 0,
         title: Row(
           children: [
@@ -25,10 +25,13 @@ class HomeScreen extends StatelessWidget {
             ),
             ActionChip(
               onPressed: () {},
-              label: const Text('Oct 12, 2023 - Nov 12, 2023'),
-              backgroundColor: colorScheme.surfaceContainerHighest.withValues(
-                alpha: 0.5,
+              label: Text(
+                'Oct 12, 2023 - Nov 12, 2023',
+                style: theme.textTheme.labelMedium?.copyWith(
+                  fontWeight: FontWeight.w600,
+                ),
               ),
+              backgroundColor: colorScheme.surfaceContainerHighest,
               side: BorderSide.none,
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(20),
@@ -439,33 +442,6 @@ class _AccountsSection extends StatelessWidget {
 class _TransactionsSection extends StatelessWidget {
   const _TransactionsSection();
 
-  String _getEmoji(String pocket, String name) {
-    final n = name.toLowerCase();
-    if (n.contains('starbucks')) return '☕';
-    if (n.contains('apple music')) return '🎵';
-    if (n.contains('netflix')) return '📺';
-    if (n.contains('gas station')) return '⛽';
-    if (n.contains('uber')) return '🚗';
-    if (n.contains('salary')) return '💰';
-    if (n.contains('gym')) return '💪';
-    if (n.contains('whole foods')) return '🥦';
-
-    switch (pocket.toLowerCase()) {
-      case 'groceries':
-        return '🛒';
-      case 'income':
-        return '💰';
-      case 'entertainment':
-        return '🎭';
-      case 'transport':
-        return '🚲';
-      case 'health':
-        return '🏥';
-      default:
-        return '📝';
-    }
-  }
-
   @override
   Widget build(BuildContext context) {
     final transactions = [
@@ -533,130 +509,162 @@ class _TransactionsSection extends StatelessWidget {
       padding: const EdgeInsets.symmetric(horizontal: 16),
       itemCount: transactions.length,
       itemBuilder: (context, index) {
-        final tx = transactions[index];
-        final amount = tx['amount'] as double;
-        final isPositive = amount > 0;
+        return _TransactionItem(tx: transactions[index]);
+      },
+    );
+  }
+}
 
-        return Container(
-          margin: const EdgeInsets.only(bottom: 12),
-          decoration: BoxDecoration(
-            color: Theme.of(context).colorScheme.surface,
-            borderRadius: BorderRadius.circular(12),
-            boxShadow: [
-              BoxShadow(
+class _TransactionItem extends StatelessWidget {
+  final Map<String, dynamic> tx;
+
+  const _TransactionItem({required this.tx});
+
+  String _getEmoji(String pocket, String name) {
+    final n = name.toLowerCase();
+    if (n.contains('starbucks')) return '☕';
+    if (n.contains('apple music')) return '🎵';
+    if (n.contains('netflix')) return '📺';
+    if (n.contains('gas station')) return '⛽';
+    if (n.contains('uber')) return '🚗';
+    if (n.contains('salary')) return '💰';
+    if (n.contains('gym')) return '💪';
+    if (n.contains('whole foods')) return '🥦';
+
+    switch (pocket.toLowerCase()) {
+      case 'groceries':
+        return '🛒';
+      case 'income':
+        return '💰';
+      case 'entertainment':
+        return '🎭';
+      case 'transport':
+        return '🚲';
+      case 'health':
+        return '🏥';
+      default:
+        return '📝';
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final amount = tx['amount'] as double;
+    final isPositive = amount > 0;
+
+    return Container(
+      margin: const EdgeInsets.only(bottom: 12),
+      decoration: BoxDecoration(
+        color: Theme.of(context).colorScheme.surface,
+        borderRadius: BorderRadius.circular(12),
+        boxShadow: [
+          BoxShadow(
+            color: Theme.of(context).colorScheme.shadow.withValues(alpha: 0.1),
+            blurRadius: 12,
+            offset: const Offset(0, 4),
+          ),
+        ],
+      ),
+      child: Padding(
+        padding: const EdgeInsets.all(12),
+        child: Row(
+          children: [
+            Container(
+              width: 48,
+              height: 48,
+              decoration: BoxDecoration(
                 color: Theme.of(
                   context,
-                ).colorScheme.shadow.withValues(alpha: 0.1),
-                blurRadius: 12,
-                offset: const Offset(0, 4),
+                ).colorScheme.surfaceContainerHighest.withValues(alpha: 0.5),
+                shape: BoxShape.circle,
               ),
-            ],
-          ),
-          child: Padding(
-            padding: const EdgeInsets.all(12),
-            child: Row(
-              children: [
-                Container(
-                  width: 48,
-                  height: 48,
-                  decoration: BoxDecoration(
-                    color: Theme.of(context).colorScheme.surfaceContainerHighest
-                        .withValues(alpha: 0.5),
-                    shape: BoxShape.circle,
-                  ),
-                  child: Center(
-                    child: Text(
-                      _getEmoji(tx['pocket'] as String, tx['name'] as String),
-                      style: const TextStyle(fontSize: 24),
-                    ),
-                  ),
+              child: Center(
+                child: Text(
+                  _getEmoji(tx['pocket'] as String, tx['name'] as String),
+                  style: const TextStyle(fontSize: 24),
                 ),
-                const SizedBox(width: 12),
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
+              ),
+            ),
+            const SizedBox(width: 12),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          Text(
-                            tx['name'] as String,
-                            style: Theme.of(context).textTheme.titleMedium
-                                ?.copyWith(fontWeight: FontWeight.bold),
-                          ),
-                          Text(
-                            '${isPositive ? '+' : ''}\$${amount.abs().toStringAsFixed(2)}',
-                            style: Theme.of(context).textTheme.titleMedium
-                                ?.copyWith(
-                                  fontWeight: FontWeight.bold,
-                                  color: isPositive
-                                      ? Colors.green.shade700
-                                      : null,
-                                ),
-                          ),
-                        ],
-                      ),
-                      const SizedBox(height: 4),
                       Text(
-                        tx['date'] as String,
-                        style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                          color: Theme.of(context).colorScheme.onSurfaceVariant,
-                        ),
+                        tx['name'] as String,
+                        style: Theme.of(context).textTheme.titleMedium
+                            ?.copyWith(fontWeight: FontWeight.bold),
                       ),
-                      const SizedBox(height: 12),
-                      Wrap(
-                        spacing: 8,
-                        runSpacing: 4,
-                        children: [
-                          Container(
-                            padding: const EdgeInsets.symmetric(
-                              horizontal: 8,
-                              vertical: 4,
+                      Text(
+                        '${isPositive ? '+' : ''}\$${amount.abs().toStringAsFixed(2)}',
+                        style: Theme.of(context).textTheme.titleMedium
+                            ?.copyWith(
+                              fontWeight: FontWeight.bold,
+                              color: isPositive ? Colors.green.shade700 : null,
                             ),
-                            decoration: BoxDecoration(
-                              color: Theme.of(
-                                context,
-                              ).colorScheme.primaryContainer,
-                              borderRadius: BorderRadius.circular(6),
-                            ),
-                            child: Text(
-                              tx['pocket'] as String,
-                              style: Theme.of(context).textTheme.labelSmall
-                                  ?.copyWith(
-                                    color: Theme.of(
-                                      context,
-                                    ).colorScheme.onPrimaryContainer,
-                                  ),
-                            ),
-                          ),
-                          ...(tx['accounts'] as List<String>).map(
-                            (acc) => Container(
-                              padding: const EdgeInsets.symmetric(
-                                horizontal: 8,
-                                vertical: 4,
-                              ),
-                              decoration: BoxDecoration(
-                                color: Theme.of(
-                                  context,
-                                ).colorScheme.surfaceContainerHighest,
-                                borderRadius: BorderRadius.circular(6),
-                              ),
-                              child: Text(
-                                acc,
-                                style: Theme.of(context).textTheme.labelSmall,
-                              ),
-                            ),
-                          ),
-                        ],
                       ),
                     ],
                   ),
-                ),
-              ],
+                  const SizedBox(height: 4),
+                  Text(
+                    tx['date'] as String,
+                    style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                      color: Theme.of(context).colorScheme.onSurfaceVariant,
+                    ),
+                  ),
+                  const SizedBox(height: 12),
+                  Wrap(
+                    spacing: 8,
+                    runSpacing: 4,
+                    children: [
+                      Container(
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 8,
+                          vertical: 4,
+                        ),
+                        decoration: BoxDecoration(
+                          color: Theme.of(context).colorScheme.primaryContainer,
+                          borderRadius: BorderRadius.circular(6),
+                        ),
+                        child: Text(
+                          tx['pocket'] as String,
+                          style: Theme.of(context).textTheme.labelSmall
+                              ?.copyWith(
+                                color: Theme.of(
+                                  context,
+                                ).colorScheme.onPrimaryContainer,
+                              ),
+                        ),
+                      ),
+                      ...(tx['accounts'] as List<String>).map(
+                        (acc) => Container(
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 8,
+                            vertical: 4,
+                          ),
+                          decoration: BoxDecoration(
+                            color: Theme.of(
+                              context,
+                            ).colorScheme.surfaceContainerHighest,
+                            borderRadius: BorderRadius.circular(6),
+                          ),
+                          child: Text(
+                            acc,
+                            style: Theme.of(context).textTheme.labelSmall,
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ],
+              ),
             ),
-          ),
-        );
-      },
+          ],
+        ),
+      ),
     );
   }
 }
