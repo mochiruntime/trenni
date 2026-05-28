@@ -1,8 +1,15 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:trenni/database/providers.dart';
+import 'package:trenni/screens/auth_screen.dart';
 import 'package:trenni/screens/home_screen.dart';
 
 void main() {
-  runApp(const MyApp());
+  runApp(
+    const ProviderScope(
+      child: MyApp(),
+    ),
+  );
 }
 
 class MyApp extends StatelessWidget {
@@ -37,7 +44,22 @@ class MyApp extends StatelessWidget {
         fontFamily: 'Inter',
       ),
       themeMode: ThemeMode.system,
-      home: const HomeScreen(),
+      home: const AppBootstrapper(),
     );
+  }
+}
+
+class AppBootstrapper extends ConsumerWidget {
+  const AppBootstrapper({super.key});
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final db = ref.watch(databaseProvider);
+
+    if (db != null) {
+      return const HomeScreen();
+    } else {
+      return const AuthScreen();
+    }
   }
 }
