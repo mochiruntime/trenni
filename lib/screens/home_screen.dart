@@ -165,7 +165,7 @@ class _PocketsSection extends ConsumerWidget {
                         Row(
                           children: [
                             Icon(
-                              IconData(pocket.iconCodePoint, fontFamily: pocket.iconFontFamily ?? 'MaterialIcons'),
+                              _getIconData(pocket.iconCodePoint),
                               size: 20,
                               color: pocket.colorValue != null ? Color(pocket.colorValue!) : colorScheme.primary,
                             ),
@@ -489,7 +489,7 @@ class _AccountsSection extends ConsumerWidget {
                         Row(
                           children: [
                             Icon(
-                              IconData(account.iconCodePoint, fontFamily: account.iconFontFamily ?? 'MaterialIcons'),
+                              _getIconData(account.iconCodePoint),
                               size: 16,
                               color: account.colorValue != null ? Color(account.colorValue!) : colorScheme.primary,
                             ),
@@ -867,3 +867,32 @@ class _TransactionItem extends StatelessWidget {
     );
   }
 }
+
+IconData _getIconData(int codePoint) {
+  if (codePoint == Icons.account_balance_outlined.codePoint) {
+    return Icons.account_balance_outlined;
+  }
+  if (codePoint == Icons.credit_card_outlined.codePoint) {
+    return Icons.credit_card_outlined;
+  }
+  if (codePoint == Icons.trending_up_outlined.codePoint) {
+    return Icons.trending_up_outlined;
+  }
+  if (codePoint == Icons.shopping_cart_outlined.codePoint) {
+    return Icons.shopping_cart_outlined;
+  }
+  if (codePoint == Icons.movie_outlined.codePoint) {
+    return Icons.movie_outlined;
+  }
+  if (codePoint == Icons.savings_outlined.codePoint) {
+    return Icons.savings_outlined;
+  }
+  if (codePoint == Icons.directions_bus_outlined.codePoint) {
+    return Icons.directions_bus_outlined;
+  }
+  if (codePoint == Icons.health_and_safety_outlined.codePoint) {
+    return Icons.health_and_safety_outlined;
+  }
+  return Icons.help_outline;
+}
+

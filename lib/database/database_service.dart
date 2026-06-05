@@ -11,6 +11,7 @@ import 'package:trenni/database/database.dart';
 class DatabaseService {
   final _secureStorage = const FlutterSecureStorage(
     aOptions: AndroidOptions(encryptedSharedPreferences: true),
+    mOptions: MacOsOptions(useDataProtectionKeyChain: false),
   );
   final _localAuth = LocalAuthentication();
   
