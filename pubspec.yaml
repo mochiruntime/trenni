@@ -35,12 +35,22 @@ dependencies:
   # Use with the CupertinoIcons class for iOS style icons.
   cupertino_icons: ^1.0.8
   fl_chart: ^1.2.0
+  drift: ^2.20.0
+  sqlite3: ^3.0.0
+  path_provider: ^2.1.2
+  path: ^1.9.0
+  flutter_secure_storage: ^9.0.0
+  local_auth: ^2.2.0
+  flutter_riverpod: ^2.5.1
+  uuid: ^4.3.3
 
 dev_dependencies:
   flutter_test:
     sdk: flutter
   integration_test:
     sdk: flutter
+  drift_dev: ^2.20.0
+  build_runner: ^2.4.9
 
   # The "flutter_lints" package below contains a set of recommended lints to
   # encourage good coding practices. The lint set provided by the package is
@@ -48,6 +58,15 @@ dev_dependencies:
   # package. See that file for information about deactivating specific lint
   # rules and activating additional ones.
   flutter_lints: ^6.0.0
+
+hooks:
+  user_defines:
+    # The sqlite3 package uses build hooks to bundle a version of SQLite with your app.
+    # It can be configured to bundle SQLite3MultipleCiphers instead, which provides encryption support.
+    # To enable encryption, add this to the pubspec of your pub workspace root (or your app's pubspec if you're not using pub workspaces).
+    # https://drift.simonbinder.eu/platforms/encryption/#setup
+    sqlite3:
+      source: sqlite3mc
 
 # For information on the generic Dart part of this file, see the
 # following page: https://dart.dev/tools/pub/pubspec
